@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XONE HUB</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ============================================================
+   ROOT / THEME
+   ============================================================ */
+:root {
+  --bg: #000000;
+  --bg-soft: #0a0a0a;
+  --bg-card: #111111;
+  --bg-card-hover: #1a1a1a;
+  --border: #222222;
+  --border-strong: #333333;
+  --text: #ffffff;
+  --text-dim: #888888;
+  --text-mute: #555555;
+  --accent: #ffffff;
+  --accent-inv: #000000;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-soft: #f5f5f5;
+  --bg-card: #fafafa;
+  --bg-card-hover: #f0f0f0;
+  --border: #e0e0e0;
+  --border-strong: #cccccc;
+  --text: #000000;
+  --text-dim: #666666;
+  --text-mute: #999999;
+  --accent: #000000;
+  --accent-inv: #ffffff;
+  --shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  transition: background 0.4s, color 0.4s;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   BACKGROUND ANIMATION (•-------------•)
+   ============================================================ */
+.bg-animation {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+}
+.bg-animation .row {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--accent);
+  animation: slideBg linear infinite;
+}
+.bg-animation .row .dot { font-size: 18px; }
+.bg-animation .row .line { letter-spacing: -1px; }
+
+@keyframes slideBg {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100vw); }
+}
+
+.row:nth-child(1) { top: 8%;  animation-duration: 22s; animation-delay: 0s; }
+.row:nth-child(2) { top: 24%; animation-duration: 30s; animation-delay: -5s; opacity: 0.6; }
+.row:nth-child(3) { top: 42%; animation-duration: 26s; animation-delay: -12s; }
+.row:nth-child(4) { top: 62%; animation-duration: 34s; animation-delay: -2s; opacity: 0.5; }
+.row:nth-child(5) { top: 80%; animation-duration: 28s; animation-delay: -18s; }
+.row:nth-child(6) { top: 92%; animation-duration: 32s; animation-delay: -8s; opacity: 0.4; }
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+.theme-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s;
+  box-shadow: var(--shadow);
+}
+.theme-toggle:hover {
+  background: var(--accent);
+  color: var(--accent-inv);
+  transform: rotate(180deg) scale(1.1);
+}
+
+/* ============================================================
+   GATE (access screen)
+   ============================================================ */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg);
+  transition: opacity 0.5s, visibility 0.5s;
+}
+.gate.hide { opacity: 0; visibility: hidden; }
+
+.gate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 40px 32px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+  animation: fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gate-icon {
+  font-size: 56px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+
+.gate-card h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.gate-sub {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+
+.ip-box {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ip-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.ip-value {
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.status.ok    { color: var(--success); background: rgba(34,197,94,0.1); }
+.status.err   { color: var(--danger);  background: rgba(239,68,68,0.1); }
+.status.wait  { color: var(--warn);    background: rgba(245,158,11,0.1); }
+
+.btn {
+  padding: 14px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-inv);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255,255,255,0.15);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--bg-card-hover); }
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover { background: #dc2626; }
+
+/* ============================================================
+   APP LAYOUT
+   ============================================================ */
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 100vh;
+}
+.app.hidden { display: none; }
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: var(--bg-soft);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  transition: transform 0.3s;
+}
+.side-header {
+  padding: 0 20px 24px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.side-header i { color: var(--accent); }
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px;
+  flex: 1;
+}
+.side-link {
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.side-link:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+.side-link.active {
+  background: var(--accent);
+  color: var(--accent-inv);
+}
+
+.side-footer {
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-mute);
+  font-family: monospace;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex: 1;
+}
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge-live {
+  background: rgba(34,197,94,0.15);
+  color: var(--success);
+  border: 1px solid rgba(34,197,94,0.3);
+}
+.badge-live i { animation: blink 1.5s ease infinite; font-size: 8px; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Tabs */
+.tab {
+  display: none;
+  padding: 28px;
+  animation: fadeIn 0.4s ease;
+}
+.tab.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero */
+.hero {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 32px;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.hero p { color: var(--text-dim); font-size: 14px; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+.stat-card i {
+  font-size: 28px;
+  color: var(--accent);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 12px;
+}
+.stat-card h3 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+.stat-card span {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* APK list */
+.apk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.apk-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+.apk-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+.apk-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.apk-card h3 i { color: var(--accent); }
+.apk-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  font-family: monospace;
+}
+.apk-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 10px 0 14px;
+  min-height: 32px;
+}
+.apk-actions {
+  display: flex;
+  gap: 8px;
+}
+.apk-actions .btn {
+  width: auto;
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-mute);
+}
+.empty i { font-size: 48px; margin-bottom: 16px; display: block; }
+
+/* Admin panel */
+.admin-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.admin-panel h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 1px;
+}
+.admin-panel h3 i { color: var(--accent); }
+
+.form-group {
+  margin-bottom: 14px;
+}
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+.file-drop {
+  border: 2px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text-dim);
+}
+.file-drop:hover, .file-drop.drag {
+  border-color: var(--accent);
+  background: var(--bg-soft);
+  color: var(--text);
+}
+.file-drop i { font-size: 32px; display: block; margin-bottom: 8px; }
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal.show { display: flex; }
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 420px;
+  width: 100%;
+  animation: fadeUp 0.3s ease;
+}
+.modal-card h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-card h2 i { color: var(--accent); }
+
+/* Toast */
+.toast-wrap {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toast.ok  { border-color: var(--success); color: var(--success); }
+.toast.err { border-color: var(--danger);  color: var(--danger); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bar */
+.progress {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 10px;
+  display: none;
+}
+.progress.show { display: block; }
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.3s;
+  animation: progressShimmer 1.5s linear infinite;
+  background-image: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    var(--text-dim) 50%,
+    var(--accent) 100%
+  );
+  background-size: 200% 100%;
+}
+@keyframes progressShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 90;
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .menu-btn { display: flex; align-items: center; justify-content: center; }
+  .hero h1 { font-size: 24px; }
+  .tab { padding: 20px 16px; }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ============================================================
+     BACKGROUND ANIMATION
+     ============================================================ -->
+<div class="bg-animation">
+  <div class="row"><span class="dot">•</span><span class="line">───────────────────</span><span class="dot">•</span></div>
+  <div class="row"><span class="dot">•</span><span class="line">─────────</span><span class="dot">•</span></div>
+  <div class="row"><span class="dot">•</span><span class="line">────────────────</span><span class="dot">•</span></div>
+  <div class="row"><span class="dot">•</span><span class="line">────────</span><span class="dot">•</span></div>
+  <div class="row"><span class="dot">•</span><span class="line">─────────────</span><span class="dot">•</span></div>
+  <div class="row"><span class="dot">•</span><span class="line">──────────</span><span class="dot">•</span></div>
+</div>
+
+<!-- ============================================================
+     THEME TOGGLE
+     ============================================================ -->
+<button class="theme-toggle" id="themeToggle" title="Toggle theme">
+  <i class="fas fa-moon"></i>
+</button>
+
+<!-- ============================================================
+     ACCESS GATE
+     ============================================================ -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-icon"><i class="fas fa-shield-halved"></i></div>
+    <h1>XONE HUB</h1>
+    <p class="gate-sub">Premium APK Repository</p>
+
+    <div class="ip-box">
+      <span class="ip-label"><i class="fas fa-globe"></i> Your IP Address</span>
+      <span class="ip-value" id="ipValue">Detecting...</span>
+    </div>
+
+    <div class="status" id="status">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <span>Initializing...</span>
+    </div>
+
+    <button class="btn btn-primary" id="requestBtn" disabled>
+      <i class="fas fa-paper-plane"></i> Request Access
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN APP
+     ============================================================ -->
+<div class="app hidden" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-header">
+      <i class="fas fa-cube"></i>
+      <span>XONE HUB</span>
+    </div>
+    <nav class="side-nav">
+      <a class="side-link active" data-tab="home"><i class="fas fa-house"></i> Home</a>
+      <a class="side-link" data-tab="apks"><i class="fas fa-box-archive"></i> APK Library</a>
+      <a class="side-link" data-tab="stats"><i class="fas fa-chart-line"></i> Statistics</a>
+      <a class="side-link" data-tab="admin"><i class="fas fa-lock"></i> Admin</a>
+    </nav>
+    <div class="side-footer">
+      <div>IP: <span id="sideIp">--</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+      <h2 id="pageTitle">Home</h2>
+      <span class="badge badge-live"><i class="fas fa-circle"></i> LIVE</span>
+    </header>
+
+    <!-- ========== HOME TAB ========== -->
+    <section class="tab active" id="tab-home">
+      <div class="hero">
+        <h1>Welcome to XONE HUB</h1>
+        <p id="heroDesc">Premium APK Repository</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fas fa-users"></i>
+          <div><h3 id="statUsers">0</h3><span>Users</span></div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-box-archive"></i>
+          <div><h3 id="statApks">0</h3><span>APKs</span></div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-download"></i>
+          <div><h3 id="statDownloads">0</h3><span>Downloads</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== APKS TAB ========== -->
+    <section class="tab" id="tab-apks">
+      <h2 style="margin-bottom:20px;font-size:20px;letter-spacing:2px;">
+        <i class="fas fa-box-archive"></i> APK LIBRARY
+      </h2>
+      <div class="apk-grid" id="apkGrid"></div>
+      <div class="empty" id="apkEmpty">
+        <i class="fas fa-inbox"></i>
+        <p>No APKs uploaded yet</p>
+      </div>
+    </section>
+
+    <!-- ========== STATS TAB ========== -->
+    <section class="tab" id="tab-stats">
+      <h2 style="margin-bottom:20px;font-size:20px;letter-spacing:2px;">
+        <i class="fas fa-chart-line"></i> STATISTICS
+      </h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fas fa-users"></i>
+          <div><h3 id="stat2Users">0</h3><span>Total Users</span></div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-box-archive"></i>
+          <div><h3 id="stat2Apks">0</h3><span>Total APKs</span></div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-download"></i>
+          <div><h3 id="stat2Downloads">0</h3><span>Total Downloads</span></div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-clock"></i>
+          <div><h3 id="stat2Pending">0</h3><span>Pending</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ADMIN TAB ========== -->
+    <section class="tab" id="tab-admin">
+      <div id="adminLogin">
+        <div class="admin-panel" style="max-width:420px;margin:60px auto;">
+          <h3><i class="fas fa-lock"></i> ADMIN LOGIN</h3>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="adminUser" placeholder="Admin">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="adminPass" placeholder="••••••••">
+          </div>
+          <button class="btn btn-primary" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> LOGIN
+          </button>
+        </div>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <!-- Upload -->
+        <div class="admin-panel">
+          <h3><i class="fas fa-cloud-upload-alt"></i> UPLOAD APK</h3>
+          <div class="form-group">
+            <label>APK Name</label>
+            <input type="text" id="apkName" placeholder="My App">
+          </div>
+          <div class="form-group">
+            <label>Version</label>
+            <input type="text" id="apkVersion" placeholder="1.0.0">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="apkDesc" placeholder="Short description..."></textarea>
+          </div>
+          <div class="file-drop" id="fileDrop">
+            <i class="fas fa-file-arrow-up"></i>
+            <div id="fileLabel">Click or drop .apk file here</div>
+            <input type="file" id="apkFile" accept=".apk" hidden>
+          </div>
+          <div class="progress" id="uploadProgress">
+            <div class="progress-bar" id="uploadBar"></div>
+          </div>
+          <button class="btn btn-primary" id="uploadBtn" style="margin-top:14px;">
+            <i class="fas fa-upload"></i> UPLOAD
+          </button>
+        </div>
+
+        <!-- Broadcast -->
+        <div class="admin-panel">
+          <h3><i class="fas fa-bullhorn"></i> BROADCAST</h3>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="broadcastMsg" placeholder="Message to all users..."></textarea>
+          </div>
+          <button class="btn btn-primary" id="broadcastBtn">
+            <i class="fas fa-paper-plane"></i> SEND
+          </button>
+        </div>
+
+        <!-- Description -->
+        <div class="admin-panel">
+          <h3><i class="fas fa-pen"></i> SITE DESCRIPTION</h3>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="siteDesc" placeholder="Site description..."></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveDescBtn">
+            <i class="fas fa-save"></i> SAVE
+          </button>
+        </div>
+
+        <!-- Password -->
+        <div class="admin-panel">
+          <h3><i class="fas fa-key"></i> CHANGE PASSWORD</h3>
+          <div class="form-group">
+            <label>Old Password</label>
+            <input type="password" id="oldPass">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPass">
+          </div>
+          <button class="btn btn-primary" id="changePassBtn">
+            <i class="fas fa-save"></i> CHANGE
+          </button>
+        </div>
+
+        <!-- Pending requests -->
+        <div class="admin-panel">
+          <h3><i class="fas fa-user-clock"></i> PENDING REQUESTS</h3>
+          <div id="pendingList"></div>
+        </div>
+
+        <!-- Logout -->
+        <button class="btn btn-danger" id="logoutBtn" style="margin-top:20px;">
+          <i class="fas fa-sign-out-alt"></i> LOGOUT
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============================================================
+     TOAST WRAP
+     ============================================================ -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG = {
+  BOT_TOKEN: "8814382996:AAF69aEUOrSQ4uvGQBGDiHXCk_795j9Qyx4",
+  ADMIN_CHAT_ID: "7058453451",
+  ADMIN_USER: "Admin",
+  ADMIN_PASS: "Admin123",
+  CHECK_INTERVAL: 4000,
+  STORAGE_KEY: "xone_hub_data"
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function toast(msg, type = "") {
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  el.innerHTML = `<i class="fas fa-${type === "ok" ? "check-circle" :
+                            type === "err" ? "exclamation-circle" :
+                            "info-circle"}"></i> ${msg}`;
+  $("#toastWrap").appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+/* ============================================================
+   LOCAL STORAGE "DATABASE"
+   ============================================================ */
+function getDB() {
+  try {
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if (!raw) return defaultDB();
+    return JSON.parse(raw);
+  } catch { return defaultDB(); }
+}
+
+function saveDB(db) {
+  localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(db));
+}
+
+function defaultDB() {
+  return {
+    users: {},        // { ip: { ip, approved, ua } }
+    apks: [],         // [ { id, name, version, desc, filename, size, downloads, uploaded } ]
+    pending: {},      // { reqId: { ip, ua, time } }
+    config: {
+      admin_user: CONFIG.ADMIN_USER,
+      admin_pass: CONFIG.ADMIN_PASS,
+      site_description: "Premium APK Repository"
+    }
+  };
+}
+
+/* ============================================================
+   TELEGRAM
+   ============================================================ */
+async function tgSend(text, markup = null) {
+  const url = `https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`;
+  const body = {
+    chat_id: CONFIG.ADMIN_CHAT_ID,
+    text: text,
+    parse_mode: "HTML"
+  };
+  if (markup) body.reply_markup = JSON.stringify(markup);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+/* ============================================================
+   IP DETECTION
+   ============================================================ */
+async function getMyIP() {
+  try {
+    const r = await fetch("https://api.ipify.org?format=json");
+    const j = await r.json();
+    return j.ip;
+  } catch {
+    try {
+      const r = await fetch("https://api64.ipify.org?format=json");
+      const j = await r.json();
+      return j.ip;
+    } catch { return "unknown"; }
+  }
+}
+
+/* ============================================================
+   ACCESS GATE
+   ============================================================ */
+let myIP = "";
+
+async function initGate() {
+  const status = $("#status");
+  status.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i><span>Detecting your IP...</span>`;
+
+  myIP = await getMyIP();
+  $("#ipValue").textContent = myIP;
+  $("#sideIp").textContent = myIP;
+
+  const db = getDB();
+
+  if (db.users[myIP]) {
+    status.className = "status ok";
+    status.innerHTML = `<i class="fas fa-check-circle"></i><span>Access granted. Welcome back!</span>`;
+    setTimeout(showMainApp, 800);
+    return;
+  }
+
+  status.className = "status";
+  status.innerHTML = `<i class="fas fa-info-circle"></i><span>Click "Request Access" to ask for permission</span>`;
+  $("#requestBtn").disabled = false;
+  $("#requestBtn").onclick = requestAccess;
+}
+
+async function requestAccess() {
+  const btn = $("#requestBtn");
+  const status = $("#status");
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> SENDING...`;
+
+  const db = getDB();
+  const reqId = Math.random().toString(36).substring(2, 14);
+
+  db.pending[reqId] = {
+    ip: myIP,
+    ua: navigator.userAgent,
+    time: new Date().toLocaleString()
+  };
+  saveDB(db);
+
+  // Send to Telegram with inline buttons
+  const text =
+    `🔔 <b>NEW ACCESS REQUEST</b>\n\n` +
+    `🆔 ID: <code>${reqId}</code>\n` +
+    `🌐 IP: <code>${myIP}</code>\n` +
+    `💻 UA: <code>${navigator.userAgent.slice(0, 80)}</code>\n` +
+    `⏰ ${new Date().toLocaleString()}\n\n` +
+    `Open the admin panel to approve/deny.`;
+
+  const sent = await tgSend(text);
+
+  if (!sent) {
+    status.className = "status err";
+    status.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>Telegram send failed. Check bot token.</span>`;
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fas fa-paper-plane"></i> Request Access`;
+    return;
+  }
+
+  status.className = "status wait";
+  status.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i><span>Waiting for admin approval...</span>`;
+  btn.innerHTML = `<i class="fas fa-clock"></i> PENDING...`;
+
+  // Poll for approval (checks local storage — admin must approve in same browser)
+  const poll = setInterval(() => {
+    const db = getDB();
+    if (db.users[myIP]) {
+      clearInterval(poll);
+      status.className = "status ok";
+      status.innerHTML = `<i class="fas fa-check-circle"></i><span>Approved! Loading...</span>`;
+      setTimeout(showMainApp, 600);
+    }
+  }, CONFIG.CHECK_INTERVAL);
+
+  toast("Request sent to admin", "ok");
+}
+
+function showMainApp() {
+  $("#gate").classList.add("hide");
+  $("#app").classList.remove("hidden");
+  loadStats();
+  loadAPKs();
+  loadDescription();
+  loadPending();
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function initTheme() {
+  const saved = localStorage.getItem("xone_theme") || "dark";
+  document.body.setAttribute("data-theme", saved);
+  updateThemeIcon(saved);
+
+  $("#themeToggle").onclick = () => {
+    const current = document.body.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+    document.body.setAttribute("data-theme", next);
+    localStorage.setItem("xone_theme", next);
+    updateThemeIcon(next);
+  };
+}
+
+function updateThemeIcon(theme) {
+  $("#themeToggle").innerHTML = theme === "dark"
+    ? `<i class="fas fa-sun"></i>`
+    : `<i class="fas fa-moon"></i>`;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function initNav() {
+  $$(".side-link").forEach(link => {
+    link.onclick = () => {
+      $$(".side-link").forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+      const tab = link.dataset.tab;
+      $$(".tab").forEach(t => t.classList.remove("active"));
+      $("#tab-" + tab).classList.add("active");
+      $("#pageTitle").textContent =
+        tab.charAt(0).toUpperCase() + tab.slice(1);
+      if (window.innerWidth <= 768) $("#sidebar").classList.remove("open");
+    };
+  });
+
+  $("#menuBtn").onclick = () => $("#sidebar").classList.toggle("open");
+}
+
+/* ============================================================
+   STATS
+   ============================================================ */
+function loadStats() {
+  const db = getDB();
+  const users = Object.keys(db.users).length;
+  const apks = db.apks.length;
+  const downloads = db.apks.reduce((s, a) => s + (a.downloads || 0), 0);
+  const pending = Object.keys(db.pending).length;
+
+  $("#statUsers").textContent = users;
+  $("#statApks").textContent = apks;
+  $("#statDownloads").textContent = downloads;
+
+  $("#stat2Users").textContent = users;
+  $("#stat2Apks").textContent = apks;
+  $("#stat2Downloads").textContent = downloads;
+  $("#stat2Pending").textContent = pending;
+}
+
+/* ============================================================
+   APK LIST
+   ============================================================ */
+function loadAPKs() {
+  const db = getDB();
+  const grid = $("#apkGrid");
+  const empty = $("#apkEmpty");
+
+  if (!db.apks.length) {
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  grid.innerHTML = db.apks.map(a => `
+    <div class="apk-card">
+      <h3><i class="fas fa-box"></i> ${escapeHTML(a.name)}</h3>
+      <div class="apk-meta">v${escapeHTML(a.version || "1.0")}</div>
+      <div class="apk-meta">📦 ${formatSize(a.size)}</div>
+      <div class="apk-meta">⬇️ ${a.downloads || 0} downloads</div>
+      <div class="apk-desc">${escapeHTML(a.desc || "No description")}</div>
+      <div class="apk-actions">
+        <button class="btn btn-primary" onclick="downloadAPK('${a.id}')">
+          <i class="fas fa-download"></i> DOWNLOAD
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function downloadAPK(id) {
+  const db = getDB();
+  const apk = db.apks.find(a => a.id === id);
+  if (!apk) return;
+  apk.downloads = (apk.downloads || 0) + 1;
+  saveDB(db);
+  loadStats();
+  loadAPKs();
+
+  // Trigger download (base64 data URL)
+  if (apk.data) {
+    const a = document.createElement("a");
+    a.href = apk.data;
+    a.download = apk.filename || (apk.name + ".apk");
+    a.click();
+  } else {
+    toast("APK data unavailable", "err");
+  }
+}
+
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+function loadDescription() {
+  const db = getDB();
+  $("#heroDesc").textContent = db.config.site_description || "Premium APK Repository";
+  $("#siteDesc").value = db.config.site_description || "";
+}
+
+/* ============================================================
+   ADMIN LOGIN
+   ============================================================ */
+function initAdmin() {
+  $("#loginBtn").onclick = () => {
+    const u = $("#adminUser").value.trim();
+    const p = $("#adminPass").value;
+    const db = getDB();
+    if (u === db.config.admin_user && p === db.config.admin_pass) {
+      $("#adminLogin").classList.add("hidden");
+      $("#adminPanel").classList.remove("hidden");
+      loadPending();
+      toast("Login successful", "ok");
+    } else {
+      toast("Invalid credentials", "err");
+    }
+  };
+
+  $("#logoutBtn").onclick = () => {
+    $("#adminPanel").classList.add("hidden");
+    $("#adminLogin").classList.remove("hidden");
+    $("#adminUser").value = "";
+    $("#adminPass").value = "";
+    toast("Logged out", "ok");
+  };
+
+  // Upload
+  const drop = $("#fileDrop");
+  const fileInput = $("#apkFile");
+
+  drop.onclick = () => fileInput.click();
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("drag"); };
+  drop.ondragleave = () => drop.classList.remove("drag");
+  drop.ondrop = (e) => {
+    e.preventDefault();
+    drop.classList.remove("drag");
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      updateFileName();
+    }
+  };
+  fileInput.onchange = updateFileName;
+
+  function updateFileName() {
+    const f = fileInput.files[0];
+    if (f) $("#fileLabel").textContent = f.name + " (" + formatSize(f.size) + ")";
+  }
+
+  $("#uploadBtn").onclick = async () => {
+    const name = $("#apkName").value.trim();
+    const version = $("#apkVersion").value.trim() || "1.0";
+    const desc = $("#apkDesc").value.trim();
+    const file = fileInput.files[0];
+
+    if (!name) { toast("Enter APK name", "err"); return; }
+    if (!file) { toast("Select a file", "err"); return; }
+
+    const bar = $("#uploadProgress");
+    const fill = $("#uploadBar");
+    bar.classList.add("show");
+
+    const reader = new FileReader();
+    reader.onprogress = (e) => {
+      if (e.lengthComputable) {
+        fill.style.width = (e.loaded / e.total * 100) + "%";
+      }
+    };
+    reader.onload = () => {
+      const db = getDB();
+      db.apks.push({
+        id: Math.random().toString(36).substring(2, 12),
+        name: name,
+        version: version,
+        desc: desc,
+        filename: file.name,
+        size: file.size,
+        data: reader.result,
+        downloads: 0,
+        uploaded: new Date().toLocaleString()
+      });
+      saveDB(db);
+      fill.style.width = "100%";
+      setTimeout(() => {
+        bar.classList.remove("show");
+        fill.style.width = "0%";
+      }, 800);
+      toast("APK uploaded", "ok");
+      $("#apkName").value = "";
+      $("#apkVersion").value = "";
+      $("#apkDesc").value = "";
+      fileInput.value = "";
+      $("#fileLabel").textContent = "Click or drop .apk file here";
+      loadAPKs();
+      loadStats();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Broadcast
+  $("#broadcastBtn").onclick = async () => {
+    const msg = $("#broadcastMsg").value.trim();
+    if (!msg) { toast("Enter message", "err"); return; }
+    const db = getDB();
+    const users = Object.keys(db.users);
+    if (!users.length) { toast("No users to broadcast", "err"); return; }
+    const text = `📢 <b>BROADCAST</b>\n\n${msg}`;
+    const ok = await tgSend(text);
+    if (ok) {
+      toast("Broadcast sent", "ok");
+      $("#broadcastMsg").value = "";
+    } else {
+      toast("Broadcast failed", "err");
+    }
+  };
+
+  // Description
+  $("#saveDescBtn").onclick = () => {
+    const db = getDB();
+    db.config.site_description = $("#siteDesc").value.trim();
+    saveDB(db);
+    loadDescription();
+    toast("Description saved", "ok");
+  };
+
+  // Change password
+  $("#changePassBtn").onclick = () => {
+    const oldP = $("#oldPass").value;
+    const newP = $("#newPass").value;
+    const db = getDB();
+    if (oldP !== db.config.admin_pass) {
+      toast("Old password wrong", "err"); return;
+    }
+    if (newP.length < 4) {
+      toast("New password too short", "err"); return;
+    }
+    db.config.admin_pass = newP;
+    saveDB(db);
+    $("#oldPass").value = "";
+    $("#newPass").value = "";
+    toast("Password changed", "ok");
+  };
+}
+
+/* ============================================================
+   PENDING REQUESTS
+   ============================================================ */
+function loadPending() {
+  const db = getDB();
+  const list = $("#pendingList");
+  const entries = Object.entries(db.pending);
+
+  if (!entries.length) {
+    list.innerHTML = `<div style="color:var(--text-mute);padding:12px;">No pending requests</div>`;
+    return;
+  }
+
+  list.innerHTML = entries.map(([id, p]) => `
+    <div class="apk-card" style="margin-bottom:10px;">
+      <h3><i class="fas fa-user"></i> ${escapeHTML(p.ip)}</h3>
+      <div class="apk-meta">🆔 ${id}</div>
+      <div class="apk-meta">⏰ ${escapeHTML(p.time)}</div>
+      <div class="apk-actions" style="margin-top:10px;">
+        <button class="btn btn-primary" onclick="approveUser('${id}')">
+          <i class="fas fa-check"></i> APPROVE
+        </button>
+        <button class="btn btn-danger" onclick="denyUser('${id}')">
+          <i class="fas fa-times"></i> DENY
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function approveUser(id) {
+  const db = getDB();
+  const p = db.pending[id];
+  if (!p) return;
+  db.users[p.ip] = {
+    ip: p.ip,
+    ua: p.ua,
+    approved: new Date().toLocaleString()
+  };
+  delete db.pending[id];
+  saveDB(db);
+  loadPending();
+  loadStats();
+  toast("User approved", "ok");
+}
+
+function denyUser(id) {
+  const db = getDB();
+  delete db.pending[id];
+  saveDB(db);
+  loadPending();
+  loadStats();
+  toast("User denied", "ok");
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function formatSize(bytes) {
+  if (!bytes) return "0 B";
+  const u = ["B", "KB", "MB", "GB"];
+  let i = 0;
+  while (bytes >= 1024 && i < u.length - 1) { bytes /= 1024; i++; }
+  return bytes.toFixed(1) + " " + u[i];
+}
+
+function escapeHTML(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  initNav();
+  initAdmin();
+  initGate();
+});
+</script>
+</body>
+</html>
