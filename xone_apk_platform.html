@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XONE • ADMIN PANEL</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #f5f5f5;
+      --text: #111111;
+      --text-secondary: #555555;
+      --border: #e0e0e0;
+      --accent: #111111;
+      --accent-invert: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --card-bg: #ffffff;
+      --input-bg: #ffffff;
+      --sidebar-bg: #ffffff;
+      --line-color: #111111;
+      --success: #111111;
+    }
+
+    body.dark {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface-2: #1a1a1a;
+      --text: #f0f0f0;
+      --text-secondary: #aaaaaa;
+      --border: #2a2a2a;
+      --accent: #ffffff;
+      --accent-invert: #111111;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --card-bg: #111111;
+      --input-bg: #1e1e1e;
+      --sidebar-bg: #0f0f0f;
+      --line-color: #ffffff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ---------- ANIMATED BACKGROUND ---------- */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-animation .line {
+      position: absolute;
+      width: 200%;
+      height: 1px;
+      background: repeating-linear-gradient(90deg, var(--line-color) 0px, var(--line-color) 4px, transparent 4px, transparent 16px);
+      opacity: 0.12;
+      animation: slideLine 24s linear infinite;
+    }
+
+    .bg-animation .line:nth-child(1) { top: 12%; animation-duration: 28s; }
+    .bg-animation .line:nth-child(2) { top: 28%; animation-duration: 20s; animation-delay: -4s; }
+    .bg-animation .line:nth-child(3) { top: 47%; animation-duration: 34s; animation-delay: -9s; }
+    .bg-animation .line:nth-child(4) { top: 68%; animation-duration: 26s; animation-delay: -15s; }
+    .bg-animation .line:nth-child(5) { top: 86%; animation-duration: 32s; animation-delay: -6s; }
+
+    @keyframes slideLine {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ---------- APP LAYOUT ---------- */
+    .app {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      width: 270px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(2px);
+      flex-shrink: 0;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      padding-left: 8px;
+    }
+
+    .logo-area i {
+      font-size: 2rem;
+      color: var(--text);
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .nav-item:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border);
+      transform: translateX(4px);
+    }
+
+    .nav-item.active {
+      background: var(--accent);
+      color: var(--accent-invert);
+      border-color: var(--accent);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-item.active i {
+      color: var(--accent-invert);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      padding: 10px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .theme-toggle i {
+      font-size: 1.1rem;
+    }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      padding: 2rem 2.5rem;
+      overflow-y: auto;
+      background: var(--bg);
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* ---------- TOP BAR ---------- */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .greeting {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+
+    .greeting i {
+      font-size: 1.8rem;
+    }
+
+    .user-ip-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface-2);
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .user-ip-badge i {
+      font-size: 1.2rem;
+    }
+
+    /* ---------- PAGE CONTAINER ---------- */
+    .page {
+      display: none;
+      flex-direction: column;
+      gap: 2rem;
+      animation: fadeSlide 0.3s ease;
+    }
+
+    .page.active-page {
+      display: flex;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- SECTION TITLE ---------- */
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 0.25rem;
+    }
+
+    .section-title i {
+      font-size: 1.7rem;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ---------- ANALYTICS GRID ---------- */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface-2);
+      border-radius: 28px;
+      padding: 1.75rem 1rem;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: scale(1.02);
+    }
+
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      animation: pulseNumber 2.4s infinite ease-in-out;
+    }
+
+    @keyframes pulseNumber {
+      0% { opacity: 0.92; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+      100% { opacity: 0.92; transform: scale(1); }
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    /* ---------- FORM ELEMENTS ---------- */
+    input, textarea, select {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    }
+
+    body.dark input:focus, body.dark textarea:focus {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--accent-invert);
+      border: none;
+      padding: 14px 26px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid transparent;
+    }
+
+    button:hover {
+      opacity: 0.85;
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+      background: var(--surface-2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---------- APK LIST ---------- */
+    .apk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .apk-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      padding: 1rem 1.5rem;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      transition: transform 0.15s;
+    }
+
+    .apk-item:hover {
+      transform: translateX(4px);
+    }
+
+    .apk-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .apk-info i {
+      font-size: 2rem;
+    }
+
+    .apk-meta h4 {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .apk-meta span {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .delete-btn {
+      background: transparent;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+    }
+
+    .delete-btn i {
+      font-size: 1.2rem;
+    }
+
+    /* ---------- LOGIN OVERLAY ---------- */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(14px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-card h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ---------- UTILITIES ---------- */
+    .hidden {
+      display: none !important;
+    }
+
+    .badge {
+      background: var(--surface-2);
+      border-radius: 40px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mt-2 { margin-top: 0.75rem; }
+    .mt-3 { margin-top: 1.25rem; }
+    .text-secondary { color: var(--text-secondary); font-size: 0.9rem; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 950px) {
+      .sidebar {
+        width: 85px;
+        padding: 1.5rem 0.6rem;
+        align-items: center;
+      }
+      .logo-area span, .nav-item span, .theme-toggle span {
+        display: none;
+      }
+      .nav-item {
+        justify-content: center;
+        padding: 14px 8px;
+      }
+      .logo-area {
+        justify-content: center;
+        padding-left: 0;
+      }
+      .main-content {
+        padding: 1.5rem;
+      }
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+      .theme-toggle {
+        justify-content: center;
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .top-bar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: 30px;
+      }
+      .user-ip-badge {
+        width: 100%;
+        justify-content: center;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+      .card {
+        padding: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ANIMATED BACKGROUND -->
+  <div class="bg-animation">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+  <!-- LOGIN OVERLAY -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <h2><i class="fas fa-lock"></i> Admin Login</h2>
+      <div class="input-group">
+        <label><i class="fas fa-user"></i> Username</label>
+        <input type="text" id="loginUser" placeholder="Admin" value="Admin">
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> Password</label>
+        <input type="password" id="loginPass" placeholder="••••••" value="Admin123">
+      </div>
+      <button id="loginBtn" style="width:100%;"><i class="fas fa-arrow-right-to-bracket"></i> Login</button>
+      <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:var(--text-secondary);">
+        <i class="fas fa-shield-halved"></i> Default: Admin / Admin123
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="appContainer" class="app hidden">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <i class="fas fa-cube"></i>
+        <span>XONE</span>
+      </div>
+      <nav class="nav-menu">
+        <div class="nav-item active" data-page="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="upload">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Upload APK</span>
+        </div>
+        <div class="nav-item" data-page="manage">
+          <i class="fas fa-trash-alt"></i>
+          <span>Delete APK</span>
+        </div>
+        <div class="nav-item" data-page="broadcast">
+          <i class="fas fa-bullhorn"></i>
+          <span>Broadcast</span>
+        </div>
+        <div class="nav-item" data-page="settings">
+          <i class="fas fa-sliders-h"></i>
+          <span>Settings</span>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+          <span>Theme</span>
+          <i class="fas fa-sun"></i>
+        </div>
+        <div class="nav-item" id="logoutBtn" style="justify-content:center; color:var(--text-secondary);">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- TOP BAR (always visible) -->
+      <div class="top-bar">
+        <div class="greeting">
+          <i class="fas fa-hand-peace"></i>
+          <span>Welcome back, Admin</span>
+        </div>
+        <div class="user-ip-badge">
+          <i class="fas fa-network-wired"></i>
+          <span id="userIpDisplay">192.168.1.1</span>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE: DASHBOARD ==================== -->
+      <div id="page-dashboard" class="page active-page">
+        <div class="section-title">
+          <i class="fas fa-chart-line"></i> Analytics Overview
+        </div>
+        <div class="analytics-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number" id="userCount">1,284</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-box"></i></div>
+            <div class="stat-number" id="apkCount">24</div>
+            <div class="stat-label">APK Files</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-download"></i></div>
+            <div class="stat-number" id="downloadCount">8,392</div>
+            <div class="stat-label">Downloads</div>
+          </div>
+        </div>
+
+        <!-- Quick preview of APKs on dashboard -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h3><i class="fas fa-list"></i> Recent APKs</h3>
+            <span class="badge" id="apkListCount">24 items</span>
+          </div>
+          <div class="apk-list" id="apkListContainer">
+            <!-- dynamically filled -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE: UPLOAD APK ==================== -->
+      <div id="page-upload" class="page">
+        <div class="section-title">
+          <i class="fas fa-cloud-upload-alt"></i> Upload New APK
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-file-upload"></i> APK Details</h3>
+            <span class="badge"><i class="fas fa-lock"></i> Admin only</span>
+          </div>
+          <div class="input-group">
+            <label>APK Name</label>
+            <input type="text" id="apkName" placeholder="e.g. MyApp v2.0">
+          </div>
+          <div class="input-group">
+            <label>Description (optional)</label>
+            <textarea id="apkDesc" rows="3" placeholder="Short description..."></textarea>
+          </div>
+          <div class="btn-group">
+            <button id="uploadApkBtn"><i class="fas fa-upload"></i> Upload APK</button>
+            <button class="secondary" id="clearApkForm"><i class="fas fa-undo-alt"></i> Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE: DELETE APK ==================== -->
+      <div id="page-manage" class="page">
+        <div class="section-title">
+          <i class="fas fa-trash-alt"></i> Manage & Delete APKs
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-database"></i> All APKs</h3>
+            <span class="badge" id="apkListCountManage">24 items</span>
+          </div>
+          <div class="apk-list" id="apkListContainerManage">
+            <!-- dynamically filled -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE: BROADCAST ==================== -->
+      <div id="page-broadcast" class="page">
+        <div class="section-title">
+          <i class="fas fa-bullhorn"></i> Broadcast Message
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-paper-plane"></i> Send Announcement</h3>
+          </div>
+          <div class="input-group">
+            <label>Custom Description / Message</label>
+            <textarea id="broadcastMsg" rows="4" placeholder="Write an announcement for all users..."></textarea>
+          </div>
+          <button id="sendBroadcastBtn"><i class="fas fa-paper-plane"></i> Send Broadcast</button>
+          <p class="mt-2 text-secondary">
+            <i class="fas fa-info-circle"></i> Last broadcast: <span id="lastBroadcast">Never</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE: SETTINGS ==================== -->
+      <div id="page-settings" class="page">
+        <div class="section-title">
+          <i class="fas fa-sliders-h"></i> Settings
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-key"></i> Change Admin Password</h3>
+          </div>
+          <div class="input-group">
+            <label>Current Password</label>
+            <input type="password" id="oldPassword" placeholder="Enter current password">
+          </div>
+          <div class="input-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="New password">
+          </div>
+          <button id="changePasswordBtn"><i class="fas fa-save"></i> Update Password</button>
+          <p class="mt-2 text-secondary">
+            <i class="fas fa-shield"></i> Default password is Admin123
+          </p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- STATE ----------
+      let isAdmin = false;
+      let usersCount = 1284;
+      let apkCount = 24;
+      let downloadCount = 8392;
+      let apkList = [
+        { id: 1, name: 'Xone Music', desc: 'Premium music player', downloads: 3240 },
+        { id: 2, name: 'Photo Editor Pro', desc: 'Advanced editing', downloads: 1890 },
+        { id: 3, name: 'VPN Secure', desc: 'Fast & private', downloads: 3262 }
+      ];
+      let adminPassword = 'Admin123';
+      let lastBroadcastTime = 'Never';
+
+      // ---------- DOM ----------
+      const loginOverlay = document.getElementById('loginOverlay');
+      const appContainer = document.getElementById('appContainer');
+      const loginBtn = document.getElementById('loginBtn');
+      const loginUser = document.getElementById('loginUser');
+      const loginPass = document.getElementById('loginPass');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const userIpDisplay = document.getElementById('userIpDisplay');
+
+      // Stats elements (dashboard)
+      const userCountEl = document.getElementById('userCount');
+      const apkCountEl = document.getElementById('apkCount');
+      const downloadCountEl = document.getElementById('downloadCount');
+      const apkListCountEl = document.getElementById('apkListCount');
+      const apkListCountManageEl = document.getElementById('apkListCountManage');
+      const lastBroadcastSpan = document.getElementById('lastBroadcast');
+
+      // Containers
+      const apkListContainer = document.getElementById('apkListContainer');
+      const apkListContainerManage = document.getElementById('apkListContainerManage');
+
+      // Upload form
+      const uploadApkBtn = document.getElementById('uploadApkBtn');
+      const apkNameInput = document.getElementById('apkName');
+      const apkDescInput = document.getElementById('apkDesc');
+      const clearApkForm = document.getElementById('clearApkForm');
+
+      // Broadcast
+      const broadcastMsg = document.getElementById('broadcastMsg');
+      const sendBroadcastBtn = document.getElementById('sendBroadcastBtn');
+
+      // Settings
+      const oldPassword = document.getElementById('oldPassword');
+      const newPassword = document.getElementById('newPassword');
+      const changePasswordBtn = document.getElementById('changePasswordBtn');
+
+      // Nav items
+      const navItems = document.querySelectorAll('.nav-item[data-page]');
+      const pages = {
+        dashboard: document.getElementById('page-dashboard'),
+        upload: document.getElementById('page-upload'),
+        manage: document.getElementById('page-manage'),
+        broadcast: document.getElementById('page-broadcast'),
+        settings: document.getElementById('page-settings')
+      };
+
+      // ---------- HELPERS ----------
+      function updateStatsUI() {
+        userCountEl.textContent = usersCount.toLocaleString();
+        apkCountEl.textContent = apkCount;
+        downloadCountEl.textContent = downloadCount.toLocaleString();
+        apkListCountEl.textContent = apkList.length + ' items';
+        apkListCountManageEl.textContent = apkList.length + ' items';
+        lastBroadcastSpan.textContent = lastBroadcastTime;
+      }
+
+      function renderApkLists() {
+        const emptyMsg = `<div style="text-align:center; padding:2rem; color:var(--text-secondary);">
+          <i class="fas fa-box-open" style="font-size:2rem;"></i><br>No APKs uploaded.
+        </div>`;
+
+        const buildListHTML = () => apkList.map(apk => `
+          <div class="apk-item" data-id="${apk.id}">
+            <div class="apk-info">
+              <i class="fas fa-android"></i>
+              <div class="apk-meta">
+                <h4>${apk.name}</h4>
+                <span>${apk.desc || 'No description'} • ${apk.downloads.toLocaleString()} downloads</span>
+              </div>
+            </div>
+            <button class="delete-btn" data-id="${apk.id}"><i class="fas fa-trash-can"></i></button>
+          </div>
+        `).join('');
+
+        // Dashboard list (without delete buttons? Actually let's keep delete buttons but only on manage page)
+        // To avoid duplicate delete buttons, we'll render dashboard list without delete buttons, and manage with.
+        // Better: Dashboard list with no delete, Manage with delete.
+        const buildDashboardList = () => apkList.map(apk => `
+          <div class="apk-item" data-id="${apk.id}">
+            <div class="apk-info">
+              <i class="fas fa-android"></i>
+              <div class="apk-meta">
+                <h4>${apk.name}</h4>
+                <span>${apk.desc || 'No description'} • ${apk.downloads.toLocaleString()} downloads</span>
+              </div>
+            </div>
+            <span class="badge"><i class="fas fa-download"></i> ${apk.downloads.toLocaleString()}</span>
+          </div>
+        `).join('');
+
+        if (apkListContainer) {
+          apkListContainer.innerHTML = apkList.length ? buildDashboardList() : emptyMsg;
+        }
+        if (apkListContainerManage) {
+          apkListContainerManage.innerHTML = apkList.length ? buildListHTML() : emptyMsg;
+          // attach delete listeners for manage page only
+          apkListContainerManage.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = Number(btn.dataset.id);
+              deleteApk(id);
+            });
+          });
+        }
+      }
+
+      function deleteApk(id) {
+        const apk = apkList.find(a => a.id === id);
+        if (!apk) return;
+        if (confirm(`Delete "${apk.name}"?`)) {
+          apkList = apkList.filter(a => a.id !== id);
+          apkCount = apkList.length;
+          downloadCount -= apk.downloads;
+          if (downloadCount < 0) downloadCount = 0;
+          updateStatsUI();
+          renderApkLists();
+        }
+      }
+
+      function fetchUserIP() {
+        const fakeIPs = ['192.168.1.1', '10.0.0.42', '172.16.0.8', '203.0.113.5', '198.51.100.7'];
+        const randomIP = fakeIPs[Math.floor(Math.random() * fakeIPs.length)];
+        userIpDisplay.textContent = randomIP;
+        return randomIP;
+      }
+
+      // ---------- PAGE NAVIGATION ----------
+      function showPage(pageId) {
+        // Hide all pages
+        Object.values(pages).forEach(p => p.classList.remove('active-page'));
+        // Show selected
+        if (pages[pageId]) {
+          pages[pageId].classList.add('active-page');
+        }
+        // Update active nav item
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.dataset.page === pageId);
+        });
+      }
+
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          if (!isAdmin) return;
+          const page = item.dataset.page;
+          showPage(page);
+        });
+      });
+
+      // ---------- LOGIN ----------
+      function performLogin() {
+        const user = loginUser.value.trim();
+        const pass = loginPass.value.trim();
+        if (user === 'Admin' && pass === adminPassword) {
+          isAdmin = true;
+          loginOverlay.classList.add('hidden');
+          appContainer.classList.remove('hidden');
+          fetchUserIP();
+          updateStatsUI();
+          renderApkLists();
+          showPage('dashboard');
+        } else {
+          alert('Invalid credentials. Use Admin / Admin123');
+        }
+      }
+
+      loginBtn.addEventListener('click', performLogin);
+      loginPass.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLogin(); });
+
+      // ---------- LOGOUT ----------
+      logoutBtn.addEventListener('click', () => {
+        isAdmin = false;
+        appContainer.classList.add('hidden');
+        loginOverlay.classList.remove('hidden');
+        loginUser.value = 'Admin';
+        loginPass.value = 'Admin123';
+        showPage('dashboard');
+      });
+
+      // ---------- THEME TOGGLE ----------
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const icon = themeToggle.querySelector('i:first-child');
+        if (document.body.classList.contains('dark')) {
+          icon.className = 'fas fa-sun';
+        } else {
+          icon.className = 'fas fa-moon';
+        }
+      });
+
+      // ---------- UPLOAD APK ----------
+      uploadApkBtn.addEventListener('click', () => {
+        if (!isAdmin) {
+          alert('Only admin can upload APKs.');
+          return;
+        }
+        const name = apkNameInput.value.trim();
+        if (!name) {
+          alert('Please enter an APK name.');
+          return;
+        }
+        const desc = apkDescInput.value.trim() || 'No description';
+        const newApk = {
+          id: Date.now(),
+          name: name,
+          desc: desc,
+          downloads: Math.floor(Math.random() * 500) + 50
+        };
+        apkList.push(newApk);
+        apkCount = apkList.length;
+        downloadCount += newApk.downloads;
+        usersCount += Math.floor(Math.random() * 5) + 1;
+        updateStatsUI();
+        renderApkLists();
+        apkNameInput.value = '';
+        apkDescInput.value = '';
+        alert(`APK "${name}" uploaded successfully.`);
+        // Optionally navigate to manage page
+        // showPage('manage');
+      });
+
+      clearApkForm.addEventListener('click', () => {
+        apkNameInput.value = '';
+        apkDescInput.value = '';
+      });
+
+      // ---------- BROADCAST ----------
+      sendBroadcastBtn.addEventListener('click', () => {
+        const msg = broadcastMsg.value.trim();
+        if (!msg) {
+          alert('Please write a message.');
+          return;
+        }
+        const now = new Date().toLocaleTimeString();
+        lastBroadcastTime = now;
+        lastBroadcastSpan.textContent = lastBroadcastTime;
+        alert(`📢 Broadcast sent: "${msg}"`);
+        broadcastMsg.value = '';
+      });
+
+      // ---------- CHANGE PASSWORD ----------
+      changePasswordBtn.addEventListener('click', () => {
+        const oldPass = oldPassword.value.trim();
+        const newPass = newPassword.value.trim();
+        if (oldPass !== adminPassword) {
+          alert('Current password is incorrect.');
+          return;
+        }
+        if (!newPass) {
+          alert('New password cannot be empty.');
+          return;
+        }
+        adminPassword = newPass;
+        alert('✅ Password updated successfully. Please remember your new password.');
+        oldPassword.value = '';
+        newPassword.value = '';
+      });
+
+      // ---------- INIT ----------
+      fetchUserIP();
+      // Ensure dashboard is visible on load
+      showPage('dashboard');
+    })();
+  </script>
+</body>
+</html>
